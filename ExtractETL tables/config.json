@@ -1,0 +1,36 @@
+{
+  "provider": [
+    {
+      "name": "mediaadmin-cn",
+      "server": "PSCSQCT00103W.devint.ad.insidemedia.net\\SQLINS02",
+      "database": "GROUPM_MATRIX3_CN_CSD",
+      "folder": "C:\\SourceMatrix\\media\\",
+      "date": "20170517",
+      "schemas": [ "MatrixStaging", "BuyingBrief" ]
+    },
+    {
+      "name": "mntr-cn",
+      "server": "PSCSQCT00103W.devint.ad.insidemedia.net\\SQLINS02",
+      "database": "GROUPM_MATRIX3_CN_CSD",
+      "folder": "C:\\SourceMatrix\\mntr\\",
+      "date": "20172002",
+      "schemas": [ "MNTRStaging" ]
+    },
+    {
+      "name": "iresearch-cn",
+      "server": "PSCSQCT00103W.devint.ad.insidemedia.net\\SQLINS02",
+      "database": "GROUPM_MATRIX3_CN_STAGING_HUB",
+      "folder": "C:\\SourceMatrix\\iresearch\\",
+      "date": "20172002",
+      "schemas": [ "iresearch" ]
+    },
+    {
+      "name": "mdm-cn",
+      "server": "PSCSQCT00103W.devint.ad.insidemedia.net\\SQLINS02",
+      "database": "GROUPM_MATRIX3_CN_STAGING_HUB",
+      "folder": "C:\\SourceMatrix\\mdm\\",
+      "date": "20172305",
+      "schemas": [ "mdm" ]
+    }
+  ]
+}
