@@ -107,6 +107,7 @@ class TestStrategy(bt.Strategy):
         global compra
         global buymessage
         global sellmessage
+        global executionType
         sizeMechaHigh = 0
         sizeMechaLow = 0
         profit = 0
@@ -114,10 +115,10 @@ class TestStrategy(bt.Strategy):
 
 
         if venta == 1:
-            fileWriter.write(sellmessage.replace("##sellprice##",str(sellprice)))    
+            fileWriter.write(executionType+";"+sellmessage.replace("##sellprice##",str(sellprice)))    
             venta = 0
         if compra == 1:
-            fileWriter.write(buymessage.replace("##buyprice##",str(buyprice)))
+            fileWriter.write(executionType+";"+buymessage.replace("##buyprice##",str(buyprice)))
             compra = 0
 
         if len(self.data)<self.data.buflen():
@@ -160,7 +161,7 @@ class TestStrategy(bt.Strategy):
                         sizeBodyLow = self.open[1]-self.dataclose[1]
 
                     if self.high[1]>= self.high[0] and self.high[0]>= self.high[-1] and sizeMechaHigh>=mecha \
-                        and str(self.data1.datetime.datetime(0).time()) == "17:15:00":# and sizeMechaHigh>sizeMechaInfHigh
+                        and str(self.data1.datetime.datetime(0).time()) == "17:15:00" and sizeMechaHigh>sizeMechaInfHigh:
                         self.order = self.buy(data = data1)
                         compra = 1
                         ordertype = "CORTO"
@@ -169,7 +170,7 @@ class TestStrategy(bt.Strategy):
                         switch = False
                         #sys.stdin.read(1)
                     elif self.low[1]<= self.low[0] and self.low[0]<= self.low[-1] and sizeMechaLow>=mecha \
-                        and str(self.data1.datetime.datetime(0).time()) == "17:15:00": #  and sizeMechaLow>sizeMechaInfLow
+                        and str(self.data1.datetime.datetime(0).time()) == "17:15:00" and sizeMechaLow>sizeMechaInfLow:
                         self.order = self.buy(data = data1)
                         compra = 1
                         ordertype = "LARGO"
@@ -179,6 +180,8 @@ class TestStrategy(bt.Strategy):
                         #sys.stdin.read(1)
                     else:
                         ordertype = "NOORDER"
+                        self.log('Norder %s, C%.2f, V%.2f, H%.2f, L%.2f, STOPLOSS= %.2f' % (ordertype,self.dataclose[1],self.volume[1],self.high[1],self.low[1],pricelimit))
+                        #sys.stdin.read(1)
 
                     maxday = self.high[1]
                     minday = self.low[1]
@@ -193,7 +196,7 @@ class TestStrategy(bt.Strategy):
 
                 if str(self.data1.datetime.datetime(0).time()) == "17:15:00" or ordertype != "NOORDER":                            
                         self.log('BUY %s, C%.2f, V%.2f, H%.2f, L%.2f, STOPLOSS= %.2f' % (ordertype,self.dataclose[1],self.volume[1],self.high[1],self.low[1],pricelimit))
-                   
+                        #sys.stdin.read(1)
 
             else:
 
@@ -238,17 +241,19 @@ class TestStrategy(bt.Strategy):
                 if  ordertype == "LARGO" :
                     if self.dataclose1[0] <= pricelimit:
                         self.order = self.sell(data = data1)
+                        profit = pricelimit - buyprice
                         switchnp = True
                         sellmessage = str(id)+";"+str(self.data.datetime.datetime(1))+";"+str(self.data1.datetime.datetime(0))+";"+"VENTAL"+";"+str(self.dataclose1[0])+";"+str(self.open1[0])+";"+str(self.volume1[0])+";"+str(self.high1[0])+";"+str(self.low1[0])+";"+str(buyprice)+";"+"##sellprice##"+";"+str(profit)+";"+str(pricelimit)+";"+str(self.williams[0])+";"+str(self.rsi10[0])+";"+str(self.rsi21[0])+";"+str(self.atr[0])+";"+str(self.atrdaily[1])+"\n"
                         venta = 1
                 else:
                     if self.dataclose1[0] >= pricelimit:
-                        self.order = self.sell(data = data1) 
+                        self.order = self.sell(data = data1)
+                        profit = buyprice - pricelimit
                         switchnp = True
                         sellmessage = str(id)+";"+str(self.data.datetime.datetime(1))+";"+str(self.data1.datetime.datetime(0))+";"+"VENTAC"+";"+str(self.dataclose1[0])+";"+str(self.open1[0])+";"+str(self.volume1[0])+";"+str(self.high1[0])+";"+str(self.low1[0])+";"+str(buyprice)+";"+"##sellprice##"+";"+str(profit)+";"+str(pricelimit)+";"+str(self.williams[0])+";"+str(self.rsi10[0])+";"+str(self.rsi21[0])+";"+str(self.atr[0])+";"+str(self.atrdaily[1])+"\n"
                         venta = 1
                 if venta == 0:
-                    fileWriter.write(str(id)+";"+str(self.data.datetime.datetime(1))+";"+str(self.data1.datetime.datetime(0))+";"+event+";"+str(self.dataclose1[0])+";"+str(self.open1[0])+";"+str(self.volume1[0])+";"+str(self.high1[0])+";"+str(self.low1[0])+";"+"0"+";"+"0"+";"+str(profit)+";"+str(pricelimit)+";"+str(self.williams[0])+";"+str(self.rsi10[0])+";"+str(self.rsi21[0])+";"+str(self.atr[0])+";"+str(self.atrdaily[1])+"\n")    
+                    fileWriter.write(executionType+";"+str(id)+";"+str(self.data.datetime.datetime(1))+";"+str(self.data1.datetime.datetime(0))+";"+event+";"+str(self.dataclose1[0])+";"+str(self.open1[0])+";"+str(self.volume1[0])+";"+str(self.high1[0])+";"+str(self.low1[0])+";"+"0"+";"+"0"+";"+str(profit)+";"+str(pricelimit)+";"+str(self.williams[0])+";"+str(self.rsi10[0])+";"+str(self.rsi21[0])+";"+str(self.atr[0])+";"+str(self.atrdaily[1])+"\n")    
                
             lastdate = self.data.datetime.datetime(0)
 
@@ -302,83 +307,108 @@ if __name__ == '__main__':
     maxday = 0
     ordertype = 'NOORDER'
     exitfilter = 10
-    nolose = 85
-    noloseamount = 30
-    mecha = 75
+    
+    nolose = 45
+    noloseamount = 35
+    
+    mecha = 30
+    mechalimit = 30
+    
+    noloselimit = 45
+    noloseamountlimit = 35
+    
+    mechaadd = 10
+    noloseadd = 5
+    noloseamountadd = 5
 
-    lastdate = datetime.datetime.now()
-    cerebro = bt.Cerebro()
+    while mecha<=mechalimit:
+        nolose = 45
+        while nolose<=noloselimit:
+            noloseamount = 35
+            while noloseamount<=noloseamountlimit and noloseamount<=nolose:
+                executionType = "Nolose: "+str(nolose)+" NoloseAmount: "+str(noloseamount)+"Mecha: "+str(mecha)
 
-    cerebro.addstrategy(TestStrategy)
+                lastdate = datetime.datetime.now()
+                cerebro = bt.Cerebro()
 
-    modpath = "C:\\Azul\\Trading\\"
-    fileWriter = open(modpath+'ResultsTrading.csv','w')
+                cerebro.addstrategy(TestStrategy)
 
-    fileWriter.write(str("id")+";"+str("DateDay")+";"+str("Date15min")+";"+"EventType"+";"+str("Close")+";"+str("Open")+";"+str("Volume")+";"+str("High")+";"+str("Low")+";"+str("BuyPriceOp")+";"+str("SellPriceOp")+";"+str("Profit")+";"+str("StopLimit")+";Williams;RSI10;RSI21;ATR;ATRDaily"+"\n")    
+                modpath = "D:\\Azul\\Trading\\"
+                fileWriter = open(modpath+'ResultsTrading.csv','a')
 
-    datapath15 = os.path.join(modpath, 'Datos15MiniIbex.csv')
-    datapath = os.path.join(modpath, 'DatosDailyIndiceIbex.csv')
+                fileWriter.write("variables;"+str("id")+";"+str("DateDay")+";"+str("Date15min")+";"+"EventType"+";"+str("Close")+";"+str("Open")+";"+str("Volume")+";"+str("High")+";"+str("Low")+";"+str("BuyPriceOp")+";"+str("SellPriceOp")+";"+str("Profit")+";"+str("StopLimit")+";Williams;RSI10;RSI21;ATR;ATRDaily"+"\n")    
 
-    data1 = bt.feeds.BacktraderCSVData(dataname=datapath15,
-        separator=';',
-        dtformat='%Y-%m-%d',
-        fromdate=datetime.datetime(2010, 1, 1),
-        reverse=True,
+                datapath15 = os.path.join(modpath, 'Datos15MiniIbex2017.csv')
+                datapath = os.path.join(modpath, 'DatosDailyIndiceIbex2017.csv')
+                #datapath15 = os.path.join(modpath, 'Datos15MiniIbex.csv')
+                #datapath = os.path.join(modpath, 'DatosDailyIndiceIbex.csv')
+                #datapath15 = os.path.join(modpath, 'Datos15FuturoDax.csv')
+                #datapath = os.path.join(modpath, 'DatosDailyIndiceDax.csv')
 
-        datetime=0,
-        time=1,
-        open=2,
-        high=3,
-        low=4,
-        close=5,
-        volume=6,
-        openinterest=7
+                data1 = bt.feeds.BacktraderCSVData(dataname=datapath15,
+                    separator=';',
+                    dtformat='%Y-%m-%d',
+                    fromdate=datetime.datetime(2010, 1, 1),
+                    reverse=True,
+
+                    datetime=0,
+                    time=1,
+                    open=2,
+                    high=3,
+                    low=4,
+                    close=5,
+                    volume=6,
+                    openinterest=7
 
         
-    )   
+                )   
 
-    # Add the Data Feed to Cerebro
-    data = bt.feeds.BacktraderCSVData(dataname=datapath,
-        separator=';',
-        dtformat='%Y-%m-%d',
-        fromdate=datetime.datetime(2010, 1, 1),
-        reverse=True,
+                # Add the Data Feed to Cerebro
+                data = bt.feeds.BacktraderCSVData(dataname=datapath,
+                    separator=';',
+                    dtformat='%Y-%m-%d',
+                    fromdate=datetime.datetime(2010, 1, 1),
+                    reverse=True,
 
-        datetime=0,
-        open=1,
-        high=2,
-        low=3,
-        close=4,
-        volume=5,
-        openinterest=6
+                    datetime=0,
+                    open=1,
+                    high=2,
+                    low=3,
+                    close=4,
+                    volume=5,
+                    openinterest=6
 
-        )
+                    )
     
-    cerebro.adddata(data)
-    cerebro.adddata(data1)
+                cerebro.adddata(data)
+                cerebro.adddata(data1)
     
     
-    # Add analyzer
-    cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="ta")
-    cerebro.addanalyzer(bt.analyzers.SQN, _name="sqn")
+                # Add analyzer
+                cerebro.addanalyzer(bt.analyzers.TradeAnalyzer, _name="ta")
+                cerebro.addanalyzer(bt.analyzers.SQN, _name="sqn")
 
-    # Set our desired cash start
-    cerebro.broker.setcash(500000.0)
+                # Set our desired cash start
+                cerebro.broker.setcash(500000.0)
 
-    # Print out the starting conditions
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+                # Print out the starting conditions
+                print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
-    # Run over everything
-    thestrats = cerebro.run()
-    thestrat = thestrats[0]
-    fileWriter.close()
+                # Run over everything
+                thestrats = cerebro.run()
+                thestrat = thestrats[0]
+                fileWriter.close()
 
-    ## Print out the final result
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
+                ## Print out the final result
+                print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
-    # Print analyzer
-    printTradeAnalysis(thestrat.analyzers.ta.get_analysis())
-    printSQN(thestrat.analyzers.sqn.get_analysis())
+                # Print analyzer
+                printTradeAnalysis(thestrat.analyzers.ta.get_analysis())
+                printSQN(thestrat.analyzers.sqn.get_analysis())
+
+                noloseamount = noloseamount + noloseamountadd
+            nolose = nolose + noloseadd
+        mecha = mecha + mechaadd
     
 
 

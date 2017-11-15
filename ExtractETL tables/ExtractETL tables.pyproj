@@ -12,8 +12,6 @@
     <OutputPath>.</OutputPath>
     <Name>ExtractETL tables</Name>
     <RootNamespace>ExtractETL tables</RootNamespace>
-    <InterpreterId>{0e6100d4-889d-4fb0-90bd-fe5870ea4f7f}</InterpreterId>
-    <InterpreterVersion>3.5</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,20 +22,21 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CalculatePortfolio.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ForecastingDeep.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TestBackTrader.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <InterpreterReference Include="{0e6100d4-889d-4fb0-90bd-fe5870ea4f7f}\3.5" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.json" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
-  <Import Condition="Exists($(PtvsTargetsFile))" Project="$(PtvsTargetsFile)" />
-  <Import Condition="!Exists($(PtvsTargetsFile))" Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
        Visual Studio and specify your pre- and post-build commands in
        the BeforeBuild and AfterBuild targets below. -->
@@ -46,4 +45,5 @@
   </Target>
   <Target Name="AfterBuild">
   </Target>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>
